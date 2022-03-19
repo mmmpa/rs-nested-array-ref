@@ -3,7 +3,9 @@ use quote::quote;
 use syn::__private::Span;
 use syn::parse::{Parse, ParseStream};
 use syn::token::Comma;
-use syn::{parse_macro_input, ExprArray, Ident, Lit, LitInt, LitStr, Type, TypeArray};
+use syn::{
+    parse_macro_input, Expr, ExprArray, ExprLit, Ident, Lit, LitInt, LitStr, Type, TypeArray,
+};
 
 #[macro_use]
 extern crate log;
@@ -60,6 +62,40 @@ impl Parse for ArrayInfo {
             x,
             raw_name,
             ref_name,
+        })
+    }
+}
+
+#[proc_macro]
+pub fn nested_ref2(input: TokenStream) -> TokenStream {
+    let ArrayInfo2 { print, el_type } = parse_macro_input!(input as ArrayInfo2);
+    let q = quote! {
+        #print;
+        // #el_type
+    };
+    q.into()
+}
+
+struct ArrayInfo2 {
+    el_type: Type,
+    print: String,
+}
+
+impl Parse for ArrayInfo2 {
+    fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+        let init: TypeArray = input.parse()?;
+
+        let len = match init.len {
+            Expr::Lit(ExprLit { lit, .. }) => match lit {
+                Lit::Int(n) => n.base10_parse::<usize>().unwrap(),
+                _ => panic!("ah!"),
+            },
+            _ => panic!("Ah!"),
+        };
+
+        Ok(Self {
+            el_type: init.elem.as_ref().clone(),
+            print: format!("{:?}", init.elem),
         })
     }
 }
