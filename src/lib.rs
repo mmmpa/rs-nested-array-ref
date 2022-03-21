@@ -25,10 +25,10 @@ impl Parse for RefMutN {
 /// # Example
 ///
 /// ```
-/// use ref_mut_n_lines::ref_mut_n_lines;
+/// use ref_mut_n::ref_mut_n;
 ///
 /// let mut data = [[0u8; 3]; 4];
-/// let _ref_data: &mut [&mut [u8]] = ref_mut_n_lines!(data, 4);
+/// let _ref_data: &mut [&mut [u8]] = ref_mut_n!(data, 4);
 /// ```
 #[proc_macro]
 pub fn ref_mut_n(input: TokenStream) -> TokenStream {
